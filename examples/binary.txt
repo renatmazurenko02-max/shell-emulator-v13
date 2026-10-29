@@ -1,0 +1,4 @@
+vfs-info
+vfs-read /data.bin
+vfs-read /empty.txt
+vfs-read "my notes.txt"

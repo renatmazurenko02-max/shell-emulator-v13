@@ -17,8 +17,8 @@ def parse_config(arguments: list[str] | None = None) -> Config:
     """Parse optional VFS and startup-script paths relative to the cwd."""
     parser = argparse.ArgumentParser(description="Shell emulator, variant 13")
     parser.add_argument(
-        "--vfs", type=Path, default=Path("demo-vfs.zip"),
-        help="Path to VFS ZIP (loading is implemented in stage 3)",
+        "--vfs", type=Path, default=Path("generated/minimal.zip"),
+        help="Path to VFS ZIP loaded into memory",
     )
     parser.add_argument(
         "--startup", type=Path, help="Path to a UTF-8 startup script",

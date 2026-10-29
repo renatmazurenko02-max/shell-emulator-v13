@@ -1,0 +1,2 @@
+vfs-info
+vfs-read /level1/level2/level3/c.txt

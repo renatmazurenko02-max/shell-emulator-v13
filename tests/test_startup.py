@@ -17,7 +17,7 @@ class ConfigTests(unittest.TestCase):
     def test_defaults(self):
         """A default VFS name is available without a startup script."""
         config = parse_config([])
-        self.assertEqual(config.vfs.name, "demo-vfs.zip")
+        self.assertEqual(config.vfs.name, "minimal.zip")
         self.assertIsNone(config.startup)
 
     def test_paths(self):
@@ -32,7 +32,7 @@ class ConfigTests(unittest.TestCase):
         """Either setting can be supplied independently."""
         self.assertIsNone(parse_config(["--vfs", "a.zip"]).startup)
         self.assertEqual(
-            parse_config(["--startup", "a.txt"]).vfs.name, "demo-vfs.zip"
+            parse_config(["--startup", "a.txt"]).vfs.name, "minimal.zip"
         )
 
     def test_invalid_options(self):

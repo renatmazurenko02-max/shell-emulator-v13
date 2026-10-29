@@ -1,0 +1,10 @@
+ls
+ls /documents
+cd
+cd "/my documents"
+ls $USERPROFILE
+ls ${USERPROFILE}
+vfs-info
+vfs-read /readme.txt
+vfs-read /missing.txt
+ls /must-not-run

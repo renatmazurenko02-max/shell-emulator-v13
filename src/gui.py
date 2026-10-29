@@ -6,6 +6,7 @@ from tkinter.scrolledtext import ScrolledText
 from src.shell import CommandError, Shell
 from src.config import Config, parse_config
 from src.startup import run_startup
+from src.vfs import VFS, VFSError
 
 
 class ShellWindow:
@@ -29,11 +30,23 @@ class ShellWindow:
         tk.Button(row, text="Выполнить", command=self.submit).pack(side="right")
         self.entry.bind("<Return>", self.submit)
         self.entry.focus_set()
-        self.write("Вариант 13. Этап 2. Команды: ls [путь], cd [путь], exit.")
-        self.write("VFS пока не загружена. ls и cd работают как заглушки.")
+        self.write("Вариант 13. Этап 3. ls и cd остаются заглушками.")
+        self.write("Команды: ls, cd, exit, vfs-info, vfs-read путь.")
         self.write(f"Параметр VFS: {config.vfs}")
         self.write(f"Стартовый скрипт: {config.startup or 'не задан'}")
-        root.after_idle(self.start_script)
+        root.after_idle(self.load_vfs)
+
+    def load_vfs(self) -> None:
+        """Load memory state before executing startup commands."""
+        try:
+            self.shell.vfs = VFS.load(self.config.vfs)
+        except VFSError as error:
+            self.write(f"Ошибка VFS: {error}")
+            self.write("Стартовый скрипт не запущен. Доступны заглушки и exit.")
+            return
+        self.write("VFS загружена в память. Исходный ZIP не изменяется.")
+        self.write(self.shell.vfs.describe())
+        self.start_script()
 
     def start_script(self) -> None:
         """Execute startup commands after the widgets have been created."""

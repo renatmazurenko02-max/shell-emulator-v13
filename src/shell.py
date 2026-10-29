@@ -6,6 +6,9 @@ import shlex
 from dataclasses import dataclass
 from typing import Mapping
 
+from src.vfs import VFS, VFSError
+from src.vfs_commands import inspect_vfs
+
 
 VARIABLE = re.compile(
     r"\$(?:\{([A-Za-z_][A-Za-z0-9_]*)\}|([A-Za-z_][A-Za-z0-9_]*))"
@@ -48,6 +51,7 @@ class Shell:
         """Use the real environment unless a test environment is supplied."""
         source = os.environ if environment is None else environment
         self.environment = dict(source)
+        self.vfs: VFS | None = None
 
     def execute(self, line: str) -> Result:
         """Run an exit command or an ls/cd stub after validating arguments."""
@@ -55,6 +59,11 @@ class Shell:
         if not tokens:
             return Result()
         command, *arguments = tokens
+        if command in {"vfs-info", "vfs-read"}:
+            try:
+                return Result(inspect_vfs(self.vfs, command, arguments))
+            except VFSError as error:
+                raise CommandError(str(error)) from error
         if command == "exit":
             if arguments:
                 raise CommandError("Использование: exit")
