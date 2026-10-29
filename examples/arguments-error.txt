@@ -1,0 +1,3 @@
+cd /documents
+ls a b
+ls /must-not-run

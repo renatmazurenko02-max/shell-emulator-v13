@@ -4,19 +4,19 @@ import tkinter as tk
 from tkinter.scrolledtext import ScrolledText
 
 from src.shell import CommandError, Shell
-
-
-VFS_NAME = "demo-vfs.zip"
+from src.config import Config, parse_config
+from src.startup import run_startup
 
 
 class ShellWindow:
     """Display a command input and a read-only interaction log."""
 
-    def __init__(self, root: tk.Tk):
-        """Build the first-stage GUI with a temporary VFS name."""
+    def __init__(self, root: tk.Tk, config: Config):
+        """Build the GUI and schedule the configured startup script."""
         self.root = root
+        self.config = config
         self.shell = Shell()
-        root.title(f"Эмулятор оболочки | VFS: {VFS_NAME}")
+        root.title(f"Эмулятор оболочки | VFS: {config.vfs.name}")
         root.geometry("850x520")
         self.output = ScrolledText(root, wrap="word", font=("Consolas", 11))
         self.output.pack(fill="both", expand=True, padx=12, pady=12)
@@ -29,9 +29,18 @@ class ShellWindow:
         tk.Button(row, text="Выполнить", command=self.submit).pack(side="right")
         self.entry.bind("<Return>", self.submit)
         self.entry.focus_set()
-        self.write("Вариант 13. Этап 1. Команды: ls [путь], cd [путь], exit.")
+        self.write("Вариант 13. Этап 2. Команды: ls [путь], cd [путь], exit.")
         self.write("VFS пока не загружена. ls и cd работают как заглушки.")
-        self.write("Пример подстановки переменной Windows: ls $USERPROFILE")
+        self.write(f"Параметр VFS: {config.vfs}")
+        self.write(f"Стартовый скрипт: {config.startup or 'не задан'}")
+        root.after_idle(self.start_script)
+
+    def start_script(self) -> None:
+        """Execute startup commands after the widgets have been created."""
+        if self.config.startup is None:
+            return
+        if run_startup(self.config.startup, self.shell, self.write):
+            self.root.destroy()
 
     def write(self, text: str) -> None:
         """Append text while keeping the transcript protected from editing."""
@@ -58,6 +67,7 @@ class ShellWindow:
 
 def main() -> None:
     """Start the graphical command loop."""
+    config = parse_config()
     root = tk.Tk()
-    ShellWindow(root)
+    ShellWindow(root, config)
     root.mainloop()

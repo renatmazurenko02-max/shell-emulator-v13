@@ -1,0 +1,5 @@
+ls
+cd /documents
+ls "my documents"
+ls $USERPROFILE
+ls ${USERPROFILE}
